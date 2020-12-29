@@ -1,8 +1,19 @@
 
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:taxi_app/allScreen/registerationScreen.dart';
+import 'package:taxi_app/allWidgets/progressDialog.dart';
+import 'package:taxi_app/main.dart';
+
+import 'mainScreen.dart';
 
 class LoginScreen extends StatelessWidget {
+  static const String idScreen='login';
+  TextEditingController emailTextEditingController=TextEditingController();
+  TextEditingController passwordTextEditingController=TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -29,6 +40,7 @@ class LoginScreen extends StatelessWidget {
                   children: [
                     SizedBox(height: 1.0,),
                     TextField(
+                      controller: emailTextEditingController,
                       keyboardType: TextInputType.emailAddress,
                       decoration: InputDecoration(
                         labelText: 'Email',
@@ -46,6 +58,7 @@ class LoginScreen extends StatelessWidget {
                     ),
                     SizedBox(height: 1.0,),
                     TextField(
+                      controller: passwordTextEditingController,
                       obscureText: true,
                       decoration: InputDecoration(
                         labelText: 'Password',
@@ -63,7 +76,21 @@ class LoginScreen extends StatelessWidget {
                     ),
                     SizedBox(height:25.0,),
                     RaisedButton(
-                        onPressed: (){},
+                        onPressed: (){
+                          if(!emailTextEditingController.text.contains('@'))
+                          {
+                            displayToastMessage('Email address is not valid', context);
+                          }
+                          else if(passwordTextEditingController.text.isEmpty)
+                          {
+                            displayToastMessage('Password number is necessary', context);
+                          }
+                          else
+                            {
+                              loginAndAuthenticateUser(context);
+                            }
+
+                        },
                     color: Colors.yellow,
                       textColor: Colors.black,
                       child: Container(
@@ -84,7 +111,9 @@ class LoginScreen extends StatelessWidget {
                 ),
                 ),
                  FlatButton(
-                     onPressed: (){},
+                     onPressed: (){
+                       Navigator.pushNamedAndRemoveUntil(context, RegisterationScreen.idScreen, (route) => false);
+                     },
                      child: Text(
                        'Do not have an account ? Register here',
                        style: TextStyle(
@@ -99,4 +128,48 @@ class LoginScreen extends StatelessWidget {
       )
     );
   }
-}
+  final FirebaseAuth _firebaseAuth=FirebaseAuth.instance;
+
+ void  loginAndAuthenticateUser(BuildContext context)async
+  {
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+      builder: (BuildContext context)
+      {
+      return  ProgressDialog(message:'Authenticating, Please wait...',
+      );
+      }
+               );
+
+    final User firebaseUser=(await _firebaseAuth
+        .signInWithEmailAndPassword(email: emailTextEditingController.text,
+        password: passwordTextEditingController.text).catchError((errorMsg)
+    {
+      Navigator.pop(context); // this is for Stopped progreesDialog
+      displayToastMessage('Error: ' + errorMsg.toString(), context);
+    })
+    ).user;
+
+    if(firebaseUser !=null)
+        {
+          usersRef.child(firebaseUser.uid).once().then( (DataSnapshot snap)
+          {
+            if(snap.value != null ){
+              Navigator.pushNamedAndRemoveUntil(context, MainScreen.idScreen, (route) => false);
+              displayToastMessage("you are logged-in now", context);
+          }else
+            {
+              Navigator.pop(context); // this is for Stopped progreesDialog
+              _firebaseAuth.signOut();
+              displayToastMessage("No record exists for this user,please create a new account",
+                  context);
+            }});
+    }else
+    {
+      //error occured - display error
+      Navigator.pop(context); // this is for Stopped progreesDialog
+      displayToastMessage("Error occured can\'t be sigin in", context);
+    }
+  }
+  }
