@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:taxi_app/allScreen/searchScreen.dart';
 import 'package:taxi_app/allWidgets/divider.dart';
 import 'package:taxi_app/assistants/assistantMethods.dart';
 import 'package:taxi_app/dataHandler/appData.dart';
@@ -178,27 +179,34 @@ class _MainScreenState extends State<MainScreen> {
             Text('Hi there ',style:TextStyle(fontSize: 12.0),),
             Text('Where to ?',style: TextStyle(fontSize:20.0,fontFamily: 'bolt-regular'),),
             SizedBox(height: 20.0,),
-            Container(
-              decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(5.0),
-                  boxShadow: [
-                    BoxShadow(
-                        color: Colors.black54,
-                        blurRadius: 6.0,
-                        spreadRadius: 0.5,
-                        offset: Offset(0.7,0.7)
-                    )
-                  ]
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: Row(
-                  children: [
-                    Icon(Icons.search,color: Colors.blueAccent,),
-                    SizedBox(width: 10.0,),
-                    Text('Search drop off')
-                  ],
+
+
+            GestureDetector(
+              onTap: (){
+                Navigator.push(context, MaterialPageRoute(builder: (context)=>SearchScreen()));
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(5.0),
+                    boxShadow: [
+                      BoxShadow(
+                          color: Colors.black54,
+                          blurRadius: 6.0,
+                          spreadRadius: 0.5,
+                          offset: Offset(0.7,0.7)
+                      )
+                    ]
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Row(
+                    children: [
+                      Icon(Icons.search,color: Colors.blueAccent,),
+                      SizedBox(width: 10.0,),
+                      Text('Search drop off')
+                    ],
+                  ),
                 ),
               ),
             ),
