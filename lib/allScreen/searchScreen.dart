@@ -147,7 +147,7 @@ class _SearchScreenState extends State<SearchScreen> {
     if(placeName.length>1)
       {
         // we are adding to this url  in the end '&components=country:sy' to search about name of city in our country
-        String autoCompleteUrl= 'https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$placeName&key=$mapKey&sessiontoken=1234567890&components=country:sy';
+        String autoCompleteUrl= 'https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$placeName&key=$mapKey&sessiontoken=1234567890&components=country:tr';
         var res =await RequestAssistant.getRequest(autoCompleteUrl);
         if(res == 'failed')
           {
@@ -226,6 +226,7 @@ class PredictionTile extends StatelessWidget {
          Provider.of<AppData>(context,listen: false).updateDropOffLocationAddress(address);
          print('this is drop off locaTION :::::');
         print(address.placeName);
+        Navigator.pop(context,'obtain direction');
       }
   }
 }

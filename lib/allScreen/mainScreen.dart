@@ -6,6 +6,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:taxi_app/allScreen/searchScreen.dart';
 import 'package:taxi_app/allWidgets/divider.dart';
+import 'package:taxi_app/allWidgets/progressDialog.dart';
 import 'package:taxi_app/assistants/assistantMethods.dart';
 import 'package:taxi_app/dataHandler/appData.dart';
 
@@ -182,8 +183,12 @@ class _MainScreenState extends State<MainScreen> {
 
 
             GestureDetector(
-              onTap: (){
-                Navigator.push(context, MaterialPageRoute(builder: (context)=>SearchScreen()));
+              onTap: ()async{
+              var res = await Navigator.push(context, MaterialPageRoute(builder: (context)=>SearchScreen()));
+              if(res =='obtain direction')
+                {
+               await   getPlaceDirection();
+                }
               },
               child: Container(
                 decoration: BoxDecoration(
@@ -259,5 +264,20 @@ class _MainScreenState extends State<MainScreen> {
     ],
 
     ));
+  }
+  Future<void> getPlaceDirection()async
+  {
+    var initialPos= Provider.of<AppData>(context,listen: false).pickUpLocation;
+    var finalPos= Provider.of<AppData>(context,listen: false).dropOffLocation;
+    var pickUpLatLng= LatLng(initialPos.latitude, initialPos.longitude);
+    var dropOffLatLng= LatLng(finalPos.latitude, finalPos.longitude);
+    showDialog(
+        context: context,
+        builder: (BuildContext context )=>ProgressDialog(message: 'Please wait...',)
+    );
+    var details= await AssistantMethods.obtainPlaceDirectionDetails(pickUpLatLng, dropOffLatLng);
+    Navigator.pop(context);
+    print('this is encoded points :::::');
+    print(details.encodedPoints);
   }
 }
