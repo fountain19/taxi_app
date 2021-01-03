@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -11,6 +10,7 @@ import 'package:taxi_app/allWidgets/divider.dart';
 import 'package:taxi_app/allWidgets/progressDialog.dart';
 import 'package:taxi_app/assistants/assistantMethods.dart';
 import 'package:taxi_app/dataHandler/appData.dart';
+import 'package:taxi_app/models/directDetails.dart';
 
 class MainScreen extends StatefulWidget {
   static const String idScreen='mainScreen';
@@ -32,9 +32,27 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
 
   Set<Marker> markersSet={};
   Set<Circle> circlesSet={};
-
+  DirectionDetails tripDirectionDetails;
   double rideDetailsContainerHeight=0;
   double searchContainerHeight=300.0;
+
+  bool drawerOpen= true;
+
+  resetApp()
+  {
+    setState(() {
+      drawerOpen=true;
+      searchContainerHeight=300.0;
+      rideDetailsContainerHeight=0;
+      bottomPaddingOfMap=230.0;
+
+       polyLineSet.clear();
+       markersSet.clear();
+       circlesSet.clear();
+       pLineCoordinates.clear();
+    });
+    locatePosition();
+  }
 
  void displayRideDetailsContainer()async
   {
@@ -43,6 +61,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
       searchContainerHeight=0;
       rideDetailsContainerHeight=240.0;
       bottomPaddingOfMap=230.0;
+      drawerOpen=false;
     });
   }
 
@@ -150,10 +169,14 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
             ),
     // HamburgerButton for Drawer
         Positioned(
-          top: 45.0,left: 22.0,
+          top: 38.0,left: 22.0,
           child: GestureDetector(
             onTap: (){
-            scaffoldkey.currentState.openDrawer();
+              if(drawerOpen)
+                {
+                  scaffoldkey.currentState.openDrawer();
+                }
+            else {resetApp();}
             },
             child: Container(
               decoration: BoxDecoration(
@@ -170,7 +193,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
               ),
               child: CircleAvatar(
                 backgroundColor: Colors.white,
-                child: Icon(Icons.menu,color: Colors.black,),
+                child: Icon((drawerOpen)?Icons.menu:Icons.close,color: Colors.black,),
                 radius: 20.0,
               ),
             ),
@@ -320,6 +343,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                 child: Padding(
                   padding: EdgeInsets.symmetric(horizontal: 16.0),
                   child: Row(
+
                     children: [
                       Image.asset('images/taxi.png',height: 70,width: 80.0,),
                       SizedBox(width: 16.0),
@@ -327,10 +351,11 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text('Car',style: TextStyle(fontFamily: 'bolt-regular',fontSize: 18.0),),
-                          Text('10km',style: TextStyle(color: Colors.grey,fontSize: 18.0),),
-
+                          Text((tripDirectionDetails != null)?tripDirectionDetails.distanceText:'',style: TextStyle(color: Colors.grey,fontSize: 18.0),),
                         ],
                       ),
+                      Expanded(child: Container()),
+                      Text((tripDirectionDetails != null)?'\$${AssistantMethods.calculateFares(tripDirectionDetails)}':'',style: TextStyle(fontFamily: 'bolt-regular',),),
                     ],
                   ),
                 ),
@@ -387,6 +412,9 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
         builder: (BuildContext context )=>ProgressDialog(message: 'Please wait...',)
     );
     var details= await AssistantMethods.obtainPlaceDirectionDetails(pickUpLatLng, dropOffLatLng);
+    setState(() {
+      tripDirectionDetails=details;
+    });
     Navigator.pop(context);
     print('this is encoded points :::::');
     print(details.encodedPoints);

@@ -50,4 +50,16 @@ class AssistantMethods{
        directionDetails.durationValue=res['routes'][0]['legs'][0]['duration']['value'];
        return directionDetails;
   }
+  static int calculateFares(DirectionDetails directionDetails)
+  {
+    // calculate in $
+     double timeTraveledFare= (directionDetails.durationValue/60)*0.20;
+     double distanceTraveledFare= (directionDetails.distanceValue/1000)*0.20;
+     double totalFareAmount= timeTraveledFare+distanceTraveledFare;
+
+     // local currency
+    // in turkey 1$ = 7.5
+    // double totalLocalAmount= totalFareAmount*7.5;
+    return totalFareAmount.truncate();
+  }
 }
