@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
@@ -7,6 +8,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:taxi_app/allScreen/loginScreen.dart';
 import 'package:taxi_app/allScreen/searchScreen.dart';
 import 'package:taxi_app/allWidgets/divider.dart';
 import 'package:taxi_app/allWidgets/progressDialog.dart';
@@ -195,6 +197,16 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
               ListTile(
                 leading: Icon(Icons.info),
                 title: Text('About',style: TextStyle(fontSize: 15),),
+              ),
+              GestureDetector(
+                onTap: (){
+                  FirebaseAuth.instance.signOut();
+                  Navigator.pushNamedAndRemoveUntil(context, LoginScreen.idScreen, (route) => false);
+                },
+                child: ListTile(
+                  leading: Icon(Icons.close),
+                  title: Text('Sign out ',style: TextStyle(fontSize: 15),),
+                ),
               ),
             ],
           ),
