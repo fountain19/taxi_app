@@ -143,7 +143,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     String address = await AssistantMethods.searchCoordinateAddress(
         position, context);
     print('this is your address :' + address);
-    initGeoFireListner();
+    initGeoFireListener();
   }
 
   static final CameraPosition _kGooglePlex = CameraPosition(
@@ -714,7 +714,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     });
   }
 
-  void initGeoFireListner()
+  void initGeoFireListener()
 {
   Geofire.initialize('availableDrivers');
     //comment
