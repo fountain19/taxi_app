@@ -23,12 +23,12 @@ class AssistantMethods{
     if(response != 'failed')
       {
        // placeAddress=response['results'][0]['formatted_address'];
-        st1=response['results'][0]['address_components'][3]['long_name'];
-        st2=response['results'][0]['address_components'][4]['long_name'];
-        st3=response['results'][0]['address_components'][5]['long_name'];
-        st4=response['results'][0]['address_components'][6]['long_name'];
+        st1=response['results'][0]['address_components'][4]['long_name'];
+        st2=response['results'][0]['address_components'][7]['long_name'];
+        st3=response['results'][0]['address_components'][6]['long_name'];
+        st4=response['results'][0]['address_components'][9]['long_name'];
 
-        placeAddress= st1 + ', ' +st2 + ', ' + st3 + ', ' + st4;
+        placeAddress= st1 + ', ' +st2 + ', '+ st3 + ', '+ st4;
 
 
         Address userPickUpAddress= Address();
