@@ -12,6 +12,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:taxi_app/allScreen/loginScreen.dart';
 import 'package:taxi_app/allScreen/searchScreen.dart';
+import 'package:taxi_app/allWidgets/collectFareDailog.dart';
 import 'package:taxi_app/allWidgets/divider.dart';
 import 'package:taxi_app/allWidgets/noDriverAvaiableDailog.dart';
 import 'package:taxi_app/allWidgets/progressDialog.dart';
@@ -97,7 +98,7 @@ bool isRequestingPositionDetails=false;
       'dropOff_address': dropOff.placeName
     };
     rideRequestRef.set(rideInfoMap);
-    rideStreamSubscription=rideRequestRef.onValue.listen((event) {
+    rideStreamSubscription=rideRequestRef.onValue.listen((event) async{
       if(event.snapshot.value==null)
         {
           return;
@@ -119,10 +120,10 @@ bool isRequestingPositionDetails=false;
         double  driverLat =double.parse(event.snapshot.value['driverLocation']['latitude'].toString());
         double  driverLng =double.parse(event.snapshot.value['driverLocation']['latitude'].toString());
         LatLng driverCurrentLocation = LatLng(driverLat, driverLng);
-        if(statusRide=='accepted')
+        if(statusRide =='accepted')
           {
             updateRideTimeToPickupLoc(driverCurrentLocation);
-          }else if(statusRide == 'onride')
+          }else if(statusRide == 'onRide')
             {
               updateRideTimeToDropOffLoc(driverCurrentLocation);
             }
@@ -150,6 +151,28 @@ bool isRequestingPositionDetails=false;
           Geofire.stopListener();
           deleteGeofileMarkers();
         }
+      if(statusRide == 'ended')
+      {
+        if(event.snapshot.value['fares'] != null)
+          {
+            int fare= int.parse(event.snapshot.value['fares'].toString());
+            var res = await showDialog(
+                context: context,
+            barrierDismissible: false,
+              builder: (BuildContext context) => CollectFareDialog(
+                paymentMethod: 'Cash',fareAmount: fare,
+              )
+            );
+            if(res == 'close')
+              {
+                rideRequestRef.onDisconnect();
+                rideRequestRef = null;
+                rideStreamSubscription.cancel();
+                rideStreamSubscription = null;
+                resetApp();
+              }
+          }
+      }
     });
   }
 
@@ -192,7 +215,7 @@ bool isRequestingPositionDetails=false;
         return;
       }
       setState(() {
-        rideStatus = 'Going to destination - ' +details.durationText;
+        rideStatus = 'Going to destination-'+details.durationText;
       });
       isRequestingPositionDetails = false;
     }
@@ -236,6 +259,13 @@ bool isRequestingPositionDetails=false;
       markersSet.clear();
       circlesSet.clear();
       pLineCoordinates.clear();
+      statusRide='';
+      driverName='';
+      driverPhone='';
+      carDetailsDriver='';
+      rideStatus='Driver is coming';
+      driverDetailsContainerHeight=0.0;
+
     });
     locatePosition();
   }
