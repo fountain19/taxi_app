@@ -1,4 +1,5 @@
 
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:firebase_auth/firebase_auth.dart';
@@ -12,6 +13,7 @@ import 'package:taxi_app/dataHandler/appData.dart';
 import 'package:taxi_app/models/address.dart';
 import 'package:taxi_app/models/allUser.dart';
 import 'package:taxi_app/models/directDetails.dart';
+import 'package:http/http.dart' as http;
 
 class AssistantMethods{
   static Future<String> searchCoordinateAddress(Position position,context) async
@@ -23,10 +25,10 @@ class AssistantMethods{
     if(response != 'failed')
       {
        // placeAddress=response['results'][0]['formatted_address'];
-        st1=response['results'][0]['address_components'][4]['long_name'];
-        st2=response['results'][0]['address_components'][7]['long_name'];
-        st3=response['results'][0]['address_components'][6]['long_name'];
-        st4=response['results'][0]['address_components'][9]['long_name'];
+        st1=response['results'][0]['address_components'][3]['long_name'];
+         st2=response['results'][0]['address_components'][4]['long_name'];
+        st3=response['results'][0]['address_components'][5]['long_name'];
+        st4=response['results'][0]['address_components'][6]['long_name'];
 
         placeAddress= st1 + ', ' +st2 + ', '+ st3 + ', '+ st4;
 
@@ -85,5 +87,38 @@ class AssistantMethods{
      var random =Random();
      int radNumber= random.nextInt(num);
         return radNumber.toDouble();
+   }
+   static sendNotificationToDriver(String token,context,String ride_request_id)async
+   {
+     var destination = Provider.of<AppData>(context,listen: false).dropOffLocation;
+     Map<String,String> headerMap=
+         {
+           'Content-Type': 'application/json',
+           'Authorization': serverToken,
+         };
+     Map notificationMap=
+     {
+       'body': 'DropOff address : ${destination.placeName}',
+       'title': 'New ride request'
+     };
+       Map dataMap =
+           {
+       'click_action': 'FLUTTER_NOTIFICATION_CLICK',
+       'id': '1',
+       'status': 'done',
+       'ride_request_id': ride_request_id,
+           };
+       Map sendNotificationMap =
+           {
+             'notification':notificationMap,
+             'data' : dataMap,
+             'priority': 'high',
+             'to': token
+           };
+       var res = await http.post(
+           'https://fcm.googleapis.com/fcm/send',
+       headers: headerMap,
+         body: jsonEncode(sendNotificationMap)
+       );
    }
 }
