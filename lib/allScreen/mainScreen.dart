@@ -11,6 +11,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:taxi_app/allScreen/loginScreen.dart';
+import 'package:taxi_app/allScreen/ratingScreen.dart';
 import 'package:taxi_app/allScreen/searchScreen.dart';
 import 'package:taxi_app/allWidgets/collectFareDailog.dart';
 import 'package:taxi_app/allWidgets/divider.dart';
@@ -23,6 +24,7 @@ import 'package:taxi_app/dataHandler/appData.dart';
 import 'package:taxi_app/main.dart';
 import 'package:taxi_app/models/directDetails.dart';
 import 'package:taxi_app/models/nearbyAvaibelDrivers.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class MainScreen extends StatefulWidget {
   static const String idScreen='mainScreen';
@@ -163,8 +165,15 @@ bool isRequestingPositionDetails=false;
                 paymentMethod: 'Cash',fareAmount: fare,
               )
             );
+            String driverid='';
             if(res == 'close')
               {
+                if(event.snapshot.value['driverId']!=null)
+                {
+                  driverid=event.snapshot.value['driverId'].toString();
+                }
+                Navigator.push(context, MaterialPageRoute(builder: (context)=>
+                RatingScreen(driverid:driverid)));
                 rideRequestRef.onDisconnect();
                 rideRequestRef = null;
                 rideStreamSubscription.cancel();
@@ -195,7 +204,7 @@ bool isRequestingPositionDetails=false;
          return;
        }
        setState(() {
-         rideStatus = 'Driver is coming-'+details.durationText;
+         rideStatus = 'Driver is coming -' + details.durationText;
        });
        isRequestingPositionDetails = false;
      }
@@ -307,16 +316,6 @@ bool isRequestingPositionDetails=false;
     createIconMarker();
     return Scaffold(
         key: scaffoldkey,
-        appBar: AppBar(
-          iconTheme: IconThemeData(
-              color: Colors.black
-          ),
-          backgroundColor: Colors.yellow,
-          title: Text('Main Screen', style: TextStyle(color: Colors.black,
-            fontWeight: FontWeight.bold,
-          ),),
-          centerTitle: true,
-        ),
         drawer: Container(
           width: 255,
           color: Colors.white,
@@ -800,50 +799,25 @@ bool isRequestingPositionDetails=false;
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                height: 55.0,width: 55.0,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.all(Radius.circular(26.0)),
-                                  border: Border.all(width: 2.0,color: Colors.grey)
-                                ),
-                                child: Icon(Icons.call),
+                         // call button
+                          Padding(
+                              padding:EdgeInsets.symmetric(horizontal: 20.0),
+                          child: RaisedButton(
+                            onPressed: ()async{
+                              launch(('tel://${driverPhone}'));
+                            },
+                            color: Colors.pink,
+                            child: Padding(
+                              padding: EdgeInsets.all(17.0),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  Text('Call driver',style: TextStyle(fontSize: 20.0,fontWeight: FontWeight.bold,color: Colors.black),),
+                                  Icon(Icons.call,color: Colors.black,size: 26.0,)
+                                ],
                               ),
-                              SizedBox(height: 10.0,),
-                              Text('Call')
-                            ],
+                            ),
                           ),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                height: 55.0,width: 55.0,
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.all(Radius.circular(26.0)),
-                                    border: Border.all(width: 2.0,color: Colors.grey)
-                                ),
-                                child: Icon(Icons.list),
-                              ),
-                              SizedBox(height: 10.0,),
-                              Text('Details')
-                            ],
-                          ),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                height: 55.0,width: 55.0,
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.all(Radius.circular(26.0)),
-                                    border: Border.all(width: 2.0,color: Colors.grey)
-                                ),
-                                child: Icon(Icons.close),
-                              ),
-                              SizedBox(height: 10.0,),
-                              Text('Cancel')
-                            ],
                           ),
                         ],
                       ),
