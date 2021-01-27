@@ -72,6 +72,9 @@ flutter:
      - images/redmarker.png
      - images/taxi.png
      - images/user_icon.png
+     - images/bike.png
+     - images/ubergo.png
+     - images/uberx.png
 
   fonts:
    - family: bolt-regular
