@@ -123,7 +123,7 @@ String uName='';
       if(event.snapshot.value['driverLocation'] != null)
       {
         double  driverLat =double.parse(event.snapshot.value['driverLocation']['latitude'].toString());
-        double  driverLng =double.parse(event.snapshot.value['driverLocation']['latitude'].toString());
+        double  driverLng =double.parse(event.snapshot.value['driverLocation']['longitude'].toString());
         LatLng driverCurrentLocation = LatLng(driverLat, driverLng);
         if(statusRide =='accepted')
           {
